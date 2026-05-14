@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabutan Bertuah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            min-height: 100vh;
+        }
+        /* Custom scrollbar for textarea */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .winner-animation {
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-blue-950 relative pb-10">
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <div class="container mx-auto px-4 pt-10 pb-8 max-w-6xl">
+        <header class="text-center mb-10 flex flex-col items-center">
+            <img src="https://raw.githubusercontent.com/mohdnorzaini-ship-it/gambar/main/1.png" alt="Logo" class="h-24 md:h-32 mb-4 object-contain drop-shadow-lg">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-2 text-blue-900">
+                Cabutan Bertuah
+            </h1>
+            <p class="text-lg text-blue-800">Masukkan senarai nama dan mulakan cabutan secara rawak!</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Panel: Configuration & Input -->
+            <div class="lg:col-span-1 bg-white/40 backdrop-blur-lg rounded-3xl p-6 border border-white/60 shadow-xl">
+                <div class="mb-4 flex justify-between items-end">
+                    <label for="namesList" class="block text-sm font-semibold text-blue-900">Senarai Nama Peserta</label>
+                    <span id="participantCount" class="text-xs font-bold bg-white/60 text-blue-800 px-3 py-1 rounded-full shadow-sm">0 nama</span>
+                </div>
+                
+                <textarea 
+                    id="namesList" 
+                    rows="15" 
+                    class="w-full bg-white/50 text-blue-950 rounded-xl p-4 border border-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-4 placeholder-blue-400 shadow-inner"
+                    placeholder="Sila masukkan nama di sini...&#10;Satu nama untuk setiap baris&#10;Contoh:&#10;Ahmad Bin Abu&#10;Siti Aminah&#10;Chong Wei&#10;Muthu"
+                    oninput="updateCount()"
+                ></textarea>
+
+                <div class="flex items-center space-x-3 mb-6 bg-white/50 p-4 rounded-xl border border-white/60 shadow-sm">
+                    <input type="checkbox" id="removeWinner" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 bg-white border-blue-200 cursor-pointer" checked>
+                    <label for="removeWinner" class="text-sm cursor-pointer select-none font-medium">
+                        Buang nama pemenang selepas dicabut (Elak menang 2 kali)
+                    </label>
+                </div>
+
+                <div class="flex items-center space-x-3 mb-6 bg-white/50 p-4 rounded-xl border border-white/60 shadow-sm">
+                    <input type="checkbox" id="soundToggle" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 bg-white border-blue-200 cursor-pointer" checked>
+                    <label for="soundToggle" class="text-sm cursor-pointer select-none font-medium">
+                        Mainkan Bunyi (Sound Effects)
+                    </label>
+                </div>
+
+                <button 
+                    onclick="clearList()"
+                    class="w-full py-2 px-4 bg-white/60 hover:bg-red-500 hover:text-white transition-colors rounded-xl text-sm font-semibold border border-white/60 shadow-sm text-blue-900">
+                    Bersihkan Senarai
+                </button>
+            </div>
+
+            <!-- Right Panel: Draw Area & Winners -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+                
+                <!-- Display Area -->
+                <div class="bg-white/40 backdrop-blur-lg rounded-3xl p-8 border border-white/60 shadow-xl flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-200/30 to-transparent pointer-events-none"></div>
+                    
+                    <div class="text-center z-10 w-full px-4">
+                        <h2 class="text-sm font-bold text-blue-700/70 mb-8 uppercase tracking-widest">Pemenang</h2>
+                        
+                        <div id="winnerDisplay" class="text-4xl md:text-7xl font-extrabold text-blue-950 break-words drop-shadow-md transition-all duration-300 min-h-[120px] flex items-center justify-center">
+                            Sedia...
+                        </div>
+                    </div>
+
+                    <button 
+                        id="drawBtn"
+                        onclick="startDraw()"
+                        class="mt-12 w-full max-w-md py-5 px-8 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl text-2xl font-bold shadow-xl transform transition hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        🎰 MULA CABUTAN 🎰
+                    </button>
+                </div>
+
+                <!-- Winners List -->
+                <div class="bg-white/40 backdrop-blur-lg rounded-3xl p-6 border border-white/60 shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-blue-900">
+                            🏆 Senarai Pemenang Lalu
+                        </h3>
+                        <span id="winnersCount" class="text-sm bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full font-bold shadow-sm">0 pemenang</span>
+                    </div>
+                    
+                    <div id="winnersListContainer" class="bg-white/50 rounded-xl p-4 min-h-[100px] max-h-[250px] overflow-y-auto shadow-inner border border-white/60">
+                        <ul id="winnersUl" class="space-y-2 text-blue-900">
+                            <li class="text-center text-blue-600/60 italic py-4" id="emptyWinnerMsg">Belum ada pemenang lagi.</li>
+                        </ul>
+                    </div>
+                    
+                    <button 
+                        onclick="clearWinners()"
+                        class="mt-4 text-xs text-blue-600 hover:text-red-500 transition-colors underline font-medium">
+                        Kosongkan Senarai Pemenang
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals / Notifications container (optional) -->
+    <div id="notification" class="fixed top-5 right-5 bg-red-500 text-white px-6 py-3 rounded-xl shadow-2xl transform transition-transform translate-x-[150%] z-50 font-semibold">
+        Sila masukkan nama peserta!
+    </div>
+
+    <script>
+        // --- Variables ---
+        let drawInterval;
+        let isDrawing = false;
+        let winners = [];
+
+        // --- Audio System ---
+        let audioCtx;
+        
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTick() {
+            if (!document.getElementById('soundToggle').checked) return;
+            initAudio();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            // Menggunakan bentuk 'square' untuk bunyi detik/klik yang lebih mekanikal dan tajam
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.03);
+            
+            // Tingkatkan kelantangan (gain) supaya lebih jelas
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.03);
+        }
+
+        function playApplause() {
+            if (!document.getElementById('soundToggle').checked) return;
+            initAudio();
+
+            const duration = 4; // 4 saat bunyi tepukan
+            const sampleRate = audioCtx.sampleRate;
+            const bufferSize = sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+            const data = buffer.getChannelData(0);
+
+            // Menjana 'white noise' dengan lonjakan rawak untuk simulasi tepuk tangan beramai-ramai
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * (Math.random() < 0.1 ? 1 : 0.2);
+            }
+
+            const noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = buffer;
+
+            // Penapis Bandpass untuk membuang bunyi statik tinggi dan membentuk bunyi seakan tepukan
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 1000;
+            filter.Q.value = 0.5;
+
+            // Kawalan kelantangan (fade in dan fade out yang perlahan)
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(1.2, audioCtx.currentTime + 0.5); // Naikkan volume perlahan-lahan
+            gainNode.gain.setValueAtTime(1.2, audioCtx.currentTime + duration - 1.5); // Kekalkan kelantangan
+            gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration); // Hilang perlahan-lahan (fade out)
+
+            noiseSource.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            noiseSource.start();
+        }
+
+        function playWinSound() {
+            if (!document.getElementById('soundToggle').checked) return;
+            initAudio();
+            
+            // Arpeggio kemenangan (C-Major/G-Major vibe)
+            const frequencies = [392.00, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
+            
+            frequencies.forEach((freq, i) => {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    
+                    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 1.5);
+                }, i * 100);
+            });
+            
+            // Bunyi Fanfare penutup
+            setTimeout(() => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.type = 'square';
+                osc.frequency.value = 783.99; // G5
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 2.0);
+            }, 500);
+        }
+
+        // --- Functions ---
+        function getNamesList() {
+            const text = document.getElementById('namesList').value;
+            // Split by newline, remove empty spaces, and filter out empty lines
+            return text.split('\n').map(name => name.trim()).filter(name => name !== '');
+        }
+
+        function updateCount() {
+            const count = getNamesList().length;
+            document.getElementById('participantCount').innerText = `${count} nama`;
+        }
+
+        function clearList() {
+            if(confirm("Adakah anda pasti untuk membersihkan senarai nama peserta?")) {
+                document.getElementById('namesList').value = '';
+                updateCount();
+            }
+        }
+
+        function showNotification(message, isError = true) {
+            const notif = document.getElementById('notification');
+            notif.innerText = message;
+            notif.className = `fixed top-5 right-5 px-6 py-3 rounded-xl shadow-2xl transform transition-transform z-50 font-semibold ${isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`;
+            
+            // Slide in
+            notif.style.transform = 'translateX(0)';
+            
+            // Slide out after 3s
+            setTimeout(() => {
+                notif.style.transform = 'translateX(150%)';
+            }, 3000);
+        }
+
+        function startDraw() {
+            if (isDrawing) return;
+
+            const names = getNamesList();
+            if (names.length === 0) {
+                showNotification("Sila masukkan sekurang-kurangnya satu nama!");
+                return;
+            }
+            if (names.length === 1) {
+                showNotification("Perlu lebih daripada 1 nama untuk membuat cabutan.");
+                return;
+            }
+
+            isDrawing = true;
+            const btn = document.getElementById('drawBtn');
+            const display = document.getElementById('winnerDisplay');
+            
+            btn.disabled = true;
+            btn.innerText = "SEDANG MENCABUT...";
+            
+            // Reset styles
+            display.classList.remove('winner-animation', 'text-pink-600');
+            display.classList.add('text-blue-950');
+
+            // Draw effect timing
+            const duration = 3000; // 3 seconds rolling
+            const endTime = Date.now() + duration;
+
+            initAudio(); // Initialize audio context on user click
+
+            // Rolling sound effect replacement (visual fast updating)
+            drawInterval = setInterval(() => {
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                display.innerText = randomName;
+
+                // Mainkan bunyi detik pada setiap pertukaran nama
+                playTick(); 
+
+                if (Date.now() >= endTime) {
+                    clearInterval(drawInterval);
+                    finishDraw(names);
+                }
+            }, 50); // Update every 50ms for smooth rolling effect
+        }
+
+        function finishDraw(currentNames) {
+            const finalIndex = Math.floor(Math.random() * currentNames.length);
+            const winner = currentNames[finalIndex];
+            
+            const display = document.getElementById('winnerDisplay');
+            display.innerText = winner;
+            
+            // Apply winner styling
+            display.classList.remove('text-blue-950');
+            display.classList.add('text-pink-600', 'winner-animation');
+
+            // Fire confetti!
+            fireConfetti();
+
+            // Play Win Sound!
+            playWinSound();
+            
+            // Play Applause Sound!
+            playApplause();
+
+            // Handle winner logic
+            addWinnerToList(winner);
+
+            // Check if we need to remove the winner
+            if (document.getElementById('removeWinner').checked) {
+                // Remove from textarea
+                currentNames.splice(finalIndex, 1);
+                document.getElementById('namesList').value = currentNames.join('\n');
+                updateCount();
+            }
+
+            // Reset UI
+            isDrawing = false;
+            const btn = document.getElementById('drawBtn');
+            btn.disabled = false;
+            btn.innerText = "🎰 MULA CABUTAN 🎰";
+        }
+
+        function addWinnerToList(name) {
+            winners.unshift(name); // Add to beginning of array
+            document.getElementById('winnersCount').innerText = `${winners.length} pemenang`;
+            
+            const ul = document.getElementById('winnersUl');
+            const emptyMsg = document.getElementById('emptyWinnerMsg');
+            
+            if (emptyMsg) {
+                emptyMsg.remove();
+            }
+
+            const li = document.createElement('li');
+            li.className = 'flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-white shadow-sm animate-[pop_0.3s_ease-out_forwards]';
+            li.innerHTML = `
+                <span class="bg-yellow-400 text-yellow-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                    ${winners.length}
+                </span>
+                <span class="font-semibold text-lg break-all">${name}</span>
+            `;
+            
+            ul.insertBefore(li, ul.firstChild);
+        }
+
+        function clearWinners() {
+            if(winners.length > 0 && confirm("Adakah anda pasti untuk mengosongkan senarai pemenang?")) {
+                winners = [];
+                document.getElementById('winnersCount').innerText = `0 pemenang`;
+                document.getElementById('winnersUl').innerHTML = '<li class="text-center text-blue-600/60 italic py-4" id="emptyWinnerMsg">Belum ada pemenang lagi.</li>';
+            }
+        }
+
+        // --- Simple Confetti Particle System ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function fireConfetti() {
+            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d', '#00e5ff'];
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2 + 100,
+                    r: Math.random() * 6 + 4,
+                    dx: Math.random() * 20 - 10,
+                    dy: Math.random() * -20 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10,
+                    tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0
+                });
+            }
+            if(particles.length > 0 && particles.length <= 150) {
+                animateConfetti();
+            }
+        }
+
+        function animateConfetti() {
+            requestAnimationFrame(animateConfetti);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach((p, index) => {
+                p.tiltAngle += p.tiltAngleInc;
+                p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle) * 2;
+                p.dy += 0.2; // gravity
+                p.y += p.dy;
+                p.x += p.dx;
+
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                ctx.stroke();
+
+                // Remove particles out of bounds
+                if (p.y > canvas.height) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        // Initial setup
+        updateCount();
+    </script>
+</body>
+</html>
