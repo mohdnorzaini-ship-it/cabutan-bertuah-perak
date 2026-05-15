@@ -9,9 +9,25 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            background: radial-gradient(circle at center, #1e3a8a 0%, #020617 70%, #000000 100%);
+            background-attachment: fixed;
             min-height: 100vh;
         }
+
+        /* WWTBAM Background Elements */
+        .wwtbam-bg {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150vw; height: 150vw;
+            background: 
+                radial-gradient(circle, transparent 40%, rgba(59, 130, 246, 0.1) 41%, transparent 42%),
+                radial-gradient(circle, transparent 50%, rgba(59, 130, 246, 0.1) 51%, transparent 52%),
+                radial-gradient(circle, transparent 60%, rgba(59, 130, 246, 0.1) 61%, transparent 62%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
         /* Custom scrollbar for textarea */
         textarea::-webkit-scrollbar {
             width: 8px;
@@ -39,54 +55,57 @@
         }
     </style>
 </head>
-<body class="text-blue-950 relative pb-10">
+<body class="text-white relative pb-10 overflow-x-hidden">
 
     <!-- Confetti Canvas -->
     <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+    
+    <!-- WWTBAM Background Grid/Circles -->
+    <div class="wwtbam-bg"></div>
 
     <div class="container mx-auto px-4 pt-10 pb-8 max-w-6xl">
         <header class="text-center mb-10 flex flex-col items-center">
-            <img src="https://raw.githubusercontent.com/mohdnorzaini-ship-it/gambar/main/1.png" alt="Logo" class="h-24 md:h-32 mb-4 object-contain drop-shadow-lg">
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-sm mb-2 text-blue-900">
+            <img src="https://raw.githubusercontent.com/mohdnorzaini-ship-it/gambar/main/1.png" alt="Logo" class="h-24 md:h-32 mb-4 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-500 drop-shadow-[0_2px_15px_rgba(234,179,8,0.5)]">
                 Cabutan Bertuah
             </h1>
-            <p class="text-lg text-blue-800">Masukkan senarai nama dan mulakan cabutan secara rawak!</p>
+            <p class="text-lg text-blue-300 font-medium">Masukkan senarai nama dan mulakan cabutan secara rawak!</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Left Panel: Configuration & Input -->
-            <div class="lg:col-span-1 bg-white/40 backdrop-blur-lg rounded-3xl p-6 border border-white/60 shadow-xl">
+            <div class="lg:col-span-1 bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 border border-blue-500/30 shadow-[0_0_25px_rgba(30,58,138,0.6)]">
                 <div class="mb-4 flex justify-between items-end">
-                    <label for="namesList" class="block text-sm font-semibold text-blue-900">Senarai Nama Peserta</label>
-                    <span id="participantCount" class="text-xs font-bold bg-white/60 text-blue-800 px-3 py-1 rounded-full shadow-sm">0 nama</span>
+                    <label for="namesList" class="block text-sm font-semibold text-blue-200">Senarai Nama Peserta</label>
+                    <span id="participantCount" class="text-xs font-bold bg-blue-900/60 text-blue-200 px-3 py-1 rounded-full shadow-sm border border-blue-500/30">0 nama</span>
                 </div>
                 
                 <textarea 
                     id="namesList" 
                     rows="15" 
-                    class="w-full bg-white/50 text-blue-950 rounded-xl p-4 border border-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-4 placeholder-blue-400 shadow-inner"
+                    class="w-full bg-black/60 text-white rounded-xl p-4 border border-blue-500/40 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 resize-none mb-4 placeholder-slate-500 shadow-inner"
                     placeholder="Sila masukkan nama di sini...&#10;Satu nama untuk setiap baris&#10;Contoh:&#10;Ahmad Bin Abu&#10;Siti Aminah&#10;Chong Wei&#10;Muthu"
                     oninput="updateCount()"
                 ></textarea>
 
-                <div class="flex items-center space-x-3 mb-6 bg-white/50 p-4 rounded-xl border border-white/60 shadow-sm">
-                    <input type="checkbox" id="removeWinner" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 bg-white border-blue-200 cursor-pointer" checked>
-                    <label for="removeWinner" class="text-sm cursor-pointer select-none font-medium">
+                <div class="flex items-center space-x-3 mb-6 bg-black/40 p-4 rounded-xl border border-blue-500/30 shadow-sm">
+                    <input type="checkbox" id="removeWinner" class="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-500 bg-slate-800 border-blue-500/50 cursor-pointer" checked>
+                    <label for="removeWinner" class="text-sm cursor-pointer select-none font-medium text-blue-100">
                         Buang nama pemenang selepas dicabut (Elak menang 2 kali)
                     </label>
                 </div>
 
-                <div class="flex items-center space-x-3 mb-6 bg-white/50 p-4 rounded-xl border border-white/60 shadow-sm">
-                    <input type="checkbox" id="soundToggle" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 bg-white border-blue-200 cursor-pointer" checked>
-                    <label for="soundToggle" class="text-sm cursor-pointer select-none font-medium">
+                <div class="flex items-center space-x-3 mb-6 bg-black/40 p-4 rounded-xl border border-blue-500/30 shadow-sm">
+                    <input type="checkbox" id="soundToggle" class="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-500 bg-slate-800 border-blue-500/50 cursor-pointer" checked>
+                    <label for="soundToggle" class="text-sm cursor-pointer select-none font-medium text-blue-100">
                         Mainkan Bunyi (Sound Effects)
                     </label>
                 </div>
 
                 <button 
                     onclick="clearList()"
-                    class="w-full py-2 px-4 bg-white/60 hover:bg-red-500 hover:text-white transition-colors rounded-xl text-sm font-semibold border border-white/60 shadow-sm text-blue-900">
+                    class="w-full py-2 px-4 bg-slate-800 hover:bg-red-900/80 transition-colors rounded-xl text-sm font-semibold border border-blue-500/30 shadow-sm text-blue-200 hover:text-white">
                     Bersihkan Senarai
                 </button>
             </div>
@@ -95,13 +114,13 @@
             <div class="lg:col-span-2 flex flex-col gap-8">
                 
                 <!-- Display Area -->
-                <div class="bg-white/40 backdrop-blur-lg rounded-3xl p-8 border border-white/60 shadow-xl flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-t from-blue-200/30 to-transparent pointer-events-none"></div>
+                <div class="bg-slate-900/80 backdrop-blur-md rounded-3xl p-8 border border-blue-500/30 shadow-[0_0_30px_rgba(30,58,138,0.8)] flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent pointer-events-none"></div>
                     
                     <div class="text-center z-10 w-full px-4">
-                        <h2 class="text-sm font-bold text-blue-700/70 mb-8 uppercase tracking-widest">Pemenang</h2>
+                        <h2 class="text-sm font-bold text-blue-400 mb-8 uppercase tracking-widest drop-shadow-md">Pemenang</h2>
                         
-                        <div id="winnerDisplay" class="text-4xl md:text-7xl font-extrabold text-blue-950 break-words drop-shadow-md transition-all duration-300 min-h-[120px] flex items-center justify-center">
+                        <div id="winnerDisplay" class="text-4xl md:text-7xl font-extrabold text-white break-words drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300 min-h-[120px] flex items-center justify-center">
                             Sedia...
                         </div>
                     </div>
@@ -109,29 +128,30 @@
                     <button 
                         id="drawBtn"
                         onclick="startDraw()"
-                        class="mt-12 w-full max-w-md py-5 px-8 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl text-2xl font-bold shadow-xl transform transition hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        🎰 MULA CABUTAN 🎰
+                        class="mt-12 w-full max-w-md py-5 px-8 bg-gradient-to-b from-blue-900 to-black border-2 border-yellow-500 hover:border-yellow-400 text-yellow-400 hover:text-yellow-300 rounded-full text-2xl font-bold shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:shadow-[0_0_30px_rgba(234,179,8,0.7)] transform transition hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none uppercase tracking-wider relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-yellow-400/0 group-hover:bg-yellow-400/10 transition-colors pointer-events-none"></div>
+                        <span class="relative z-10">🎰 MULA CABUTAN 🎰</span>
                     </button>
                 </div>
 
                 <!-- Winners List -->
-                <div class="bg-white/40 backdrop-blur-lg rounded-3xl p-6 border border-white/60 shadow-xl">
+                <div class="bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 border border-blue-500/30 shadow-[0_0_25px_rgba(30,58,138,0.6)]">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold flex items-center gap-2 text-blue-900">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-yellow-500 drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]">
                             🏆 Senarai Pemenang Lalu
                         </h3>
-                        <span id="winnersCount" class="text-sm bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full font-bold shadow-sm">0 pemenang</span>
+                        <span id="winnersCount" class="text-sm bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 px-3 py-1 rounded-full font-bold shadow-sm">0 pemenang</span>
                     </div>
                     
-                    <div id="winnersListContainer" class="bg-white/50 rounded-xl p-4 min-h-[100px] max-h-[250px] overflow-y-auto shadow-inner border border-white/60">
-                        <ul id="winnersUl" class="space-y-2 text-blue-900">
-                            <li class="text-center text-blue-600/60 italic py-4" id="emptyWinnerMsg">Belum ada pemenang lagi.</li>
+                    <div id="winnersListContainer" class="bg-black/50 rounded-xl p-4 min-h-[100px] max-h-[250px] overflow-y-auto shadow-inner border border-blue-500/30">
+                        <ul id="winnersUl" class="space-y-2 text-white">
+                            <li class="text-center text-blue-400/50 italic py-4" id="emptyWinnerMsg">Belum ada pemenang lagi.</li>
                         </ul>
                     </div>
                     
                     <button 
                         onclick="clearWinners()"
-                        class="mt-4 text-xs text-blue-600 hover:text-red-500 transition-colors underline font-medium">
+                        class="mt-4 text-xs text-blue-400 hover:text-red-400 transition-colors underline font-medium">
                         Kosongkan Senarai Pemenang
                     </button>
                 </div>
@@ -141,8 +161,19 @@
     </div>
 
     <!-- Modals / Notifications container (optional) -->
-    <div id="notification" class="fixed top-5 right-5 bg-red-500 text-white px-6 py-3 rounded-xl shadow-2xl transform transition-transform translate-x-[150%] z-50 font-semibold">
+    <div id="notification" class="fixed top-5 right-5 bg-red-600 text-white px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.5)] transform transition-transform translate-x-[150%] z-50 font-semibold border border-red-400">
         Sila masukkan nama peserta!
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-slate-900 border border-blue-500/50 rounded-2xl p-6 max-w-sm w-full shadow-[0_0_30px_rgba(30,58,138,0.8)] text-center transform scale-95 transition-transform duration-200" id="confirmModalBox">
+            <h3 class="text-xl font-bold text-yellow-500 mb-6 drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]" id="confirmModalMsg">Adakah anda pasti?</h3>
+            <div class="flex gap-4 justify-center">
+                <button onclick="closeConfirm()" class="px-6 py-2 rounded-full bg-slate-800 text-blue-200 hover:bg-slate-700 transition border border-blue-500/30 font-semibold">Batal</button>
+                <button onclick="executeConfirm()" class="px-6 py-2 rounded-full bg-red-600 text-white hover:bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.5)] transition border border-red-400 font-semibold">Pasti</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -150,9 +181,45 @@
         let drawInterval;
         let isDrawing = false;
         let winners = [];
+        let currentConfirmAction = null; // Variable for custom confirm modal
+
+        // --- Custom Confirm Logic ---
+        function showConfirm(msg, action) {
+            document.getElementById('confirmModalMsg').innerText = msg;
+            const modal = document.getElementById('confirmModal');
+            const box = document.getElementById('confirmModalBox');
+            modal.classList.remove('hidden');
+            // Timeout for CSS transition effect
+            setTimeout(() => {
+                box.classList.remove('scale-95');
+                box.classList.add('scale-100');
+            }, 10);
+            currentConfirmAction = action;
+        }
+
+        function closeConfirm() {
+            const modal = document.getElementById('confirmModal');
+            const box = document.getElementById('confirmModalBox');
+            box.classList.remove('scale-100');
+            box.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+            currentConfirmAction = null;
+        }
+
+        function executeConfirm() {
+            if (currentConfirmAction) {
+                currentConfirmAction();
+            }
+            closeConfirm();
+        }
 
         // --- Audio System ---
         let audioCtx;
+        let suspenseOsc;
+        let suspenseGain;
+        let suspenseLfo;
         
         function initAudio() {
             if (!audioCtx) {
@@ -160,6 +227,65 @@
             }
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
+            }
+        }
+
+        function playSuspenseDrone() {
+            if (!document.getElementById('soundToggle').checked) return;
+            initAudio();
+
+            // Bunyi dron latar belakang yang LEBIH mendebarkan (Pitch naik & denyutan laju)
+            suspenseOsc = audioCtx.createOscillator();
+            suspenseGain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            
+            // 1. Dron Bass (Pitch akan naik perlahan-lahan untuk bina ketegangan)
+            suspenseOsc.type = 'sawtooth';
+            suspenseOsc.frequency.setValueAtTime(45, audioCtx.currentTime); 
+            suspenseOsc.frequency.linearRampToValueAtTime(85, audioCtx.currentTime + 3); 
+
+            // 2. LFO untuk efek "Denyutan Jantung" yang semakin laju
+            suspenseLfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            suspenseLfo.type = 'sine';
+            suspenseLfo.frequency.setValueAtTime(3, audioCtx.currentTime); // Mula dengan 3 denyutan/saat
+            suspenseLfo.frequency.linearRampToValueAtTime(14, audioCtx.currentTime + 3); // Laju ke 14 denyutan/saat
+            
+            suspenseLfo.connect(lfoGain);
+            lfoGain.gain.value = 0.7; // Kedalaman denyutan
+            
+            // Node gain tambahan untuk denyutan
+            const throbGain = audioCtx.createGain();
+            throbGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            lfoGain.connect(throbGain.gain);
+
+            filter.type = 'lowpass';
+            // Filter terbuka perlahan-lahan untuk bunyi yang semakin jelas dan bingit
+            filter.frequency.setValueAtTime(150, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(3000, audioCtx.currentTime + 3); 
+
+            suspenseGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            suspenseGain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.5); // Fade in
+
+            // Sambungan: Osc -> Filter -> Throb(Denyutan) -> Master Gain -> Speaker
+            suspenseOsc.connect(filter);
+            filter.connect(throbGain);
+            throbGain.connect(suspenseGain);
+            suspenseGain.connect(audioCtx.destination);
+
+            suspenseOsc.start();
+            suspenseLfo.start();
+        }
+
+        function stopSuspenseDrone() {
+            if (suspenseGain && suspenseOsc) {
+                suspenseGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+                setTimeout(() => {
+                    try { 
+                        suspenseOsc.stop(); 
+                        if(suspenseLfo) suspenseLfo.stop();
+                    } catch(e){}
+                }, 100);
             }
         }
 
@@ -173,17 +299,16 @@
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             
-            // Menggunakan bentuk 'square' untuk bunyi detik/klik yang lebih mekanikal dan tajam
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.03);
+            // Bunyi "blip" logam (triangle) yang tajam dan mendebarkan
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
             
-            // Tingkatkan kelantangan (gain) supaya lebih jelas
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
             
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.03);
+            osc.stop(audioCtx.currentTime + 0.04);
         }
 
         function playApplause() {
@@ -228,43 +353,48 @@
             if (!document.getElementById('soundToggle').checked) return;
             initAudio();
             
-            // Arpeggio kemenangan (C-Major/G-Major vibe)
-            const frequencies = [392.00, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
+            // Kord "Jawapan Betul" WWTBAM (Kord Major Synthesizer yang megah)
+            const frequencies = [261.63, 329.63, 392.00, 523.25, 659.25]; // C4, E4, G4, C5, E5
             
-            frequencies.forEach((freq, i) => {
-                setTimeout(() => {
-                    const osc = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    
-                    osc.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    
-                    osc.type = 'triangle';
-                    osc.frequency.value = freq;
-                    
-                    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-                    gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
-                    
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 1.5);
-                }, i * 100);
-            });
-            
-            // Bunyi Fanfare penutup
-            setTimeout(() => {
+            frequencies.forEach((freq) => {
                 const osc = audioCtx.createOscillator();
+                const filter = audioCtx.createBiquadFilter();
                 const gainNode = audioCtx.createGain();
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                osc.type = 'square';
-                osc.frequency.value = 783.99; // G5
+                
+                osc.type = 'sawtooth'; // Bunyi seakan 'brass' atau pad tebal
+                osc.frequency.value = freq;
+                
+                // Sweep penapis untuk efek "impact"
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(3000, audioCtx.currentTime + 0.1);
+                filter.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 3.0);
+                
+                // Attack yang tajam, decay yang panjang
                 gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
                 gainNode.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
+                
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
                 osc.start();
-                osc.stop(audioCtx.currentTime + 2.0);
-            }, 500);
+                osc.stop(audioCtx.currentTime + 3.0);
+            });
+
+            // Tambah bunyi dentuman bass (impact) di awal
+            const bassOsc = audioCtx.createOscillator();
+            const bassGain = audioCtx.createGain();
+            bassOsc.type = 'sine';
+            bassOsc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            bassOsc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 1.0);
+            bassGain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+            bassGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+            bassOsc.connect(bassGain);
+            bassGain.connect(audioCtx.destination);
+            bassOsc.start();
+            bassOsc.stop(audioCtx.currentTime + 2.0);
         }
 
         // --- Functions ---
@@ -280,10 +410,10 @@
         }
 
         function clearList() {
-            if(confirm("Adakah anda pasti untuk membersihkan senarai nama peserta?")) {
+            showConfirm("Adakah anda pasti untuk membersihkan senarai nama peserta?", () => {
                 document.getElementById('namesList').value = '';
                 updateCount();
-            }
+            });
         }
 
         function showNotification(message, isError = true) {
@@ -318,17 +448,17 @@
             const display = document.getElementById('winnerDisplay');
             
             btn.disabled = true;
-            btn.innerText = "SEDANG MENCABUT...";
+            btn.querySelector('span').innerText = "SEDANG MENCABUT...";
             
             // Reset styles
-            display.classList.remove('winner-animation', 'text-pink-600');
-            display.classList.add('text-blue-950');
+            display.className = 'text-4xl md:text-7xl font-extrabold text-white break-words drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300 min-h-[120px] flex items-center justify-center';
 
             // Draw effect timing
             const duration = 3000; // 3 seconds rolling
             const endTime = Date.now() + duration;
 
             initAudio(); // Initialize audio context on user click
+            playSuspenseDrone(); // Mulakan bunyi debaran WWTBAM
 
             // Rolling sound effect replacement (visual fast updating)
             drawInterval = setInterval(() => {
@@ -352,9 +482,10 @@
             const display = document.getElementById('winnerDisplay');
             display.innerText = winner;
             
+            stopSuspenseDrone(); // Hentikan bunyi debaran
+
             // Apply winner styling
-            display.classList.remove('text-blue-950');
-            display.classList.add('text-pink-600', 'winner-animation');
+            display.className = 'text-4xl md:text-7xl font-extrabold text-yellow-400 break-words drop-shadow-[0_0_25px_rgba(234,179,8,1)] transition-all duration-300 min-h-[120px] flex items-center justify-center winner-animation';
 
             // Fire confetti!
             fireConfetti();
@@ -380,7 +511,7 @@
             isDrawing = false;
             const btn = document.getElementById('drawBtn');
             btn.disabled = false;
-            btn.innerText = "🎰 MULA CABUTAN 🎰";
+            btn.querySelector('span').innerText = "🎰 MULA CABUTAN 🎰";
         }
 
         function addWinnerToList(name) {
@@ -395,22 +526,24 @@
             }
 
             const li = document.createElement('li');
-            li.className = 'flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-white shadow-sm animate-[pop_0.3s_ease-out_forwards]';
+            li.className = 'flex items-center gap-3 p-3 bg-blue-950/60 rounded-lg border border-blue-500/40 shadow-[0_0_10px_rgba(30,58,138,0.5)] animate-[pop_0.3s_ease-out_forwards]';
             li.innerHTML = `
-                <span class="bg-yellow-400 text-yellow-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                <span class="bg-gradient-to-br from-yellow-400 to-yellow-600 text-black w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-[0_0_10px_rgba(234,179,8,0.5)]">
                     ${winners.length}
                 </span>
-                <span class="font-semibold text-lg break-all">${name}</span>
+                <span class="font-semibold text-lg break-all text-blue-50">${name}</span>
             `;
             
             ul.insertBefore(li, ul.firstChild);
         }
 
         function clearWinners() {
-            if(winners.length > 0 && confirm("Adakah anda pasti untuk mengosongkan senarai pemenang?")) {
-                winners = [];
-                document.getElementById('winnersCount').innerText = `0 pemenang`;
-                document.getElementById('winnersUl').innerHTML = '<li class="text-center text-blue-600/60 italic py-4" id="emptyWinnerMsg">Belum ada pemenang lagi.</li>';
+            if(winners.length > 0) {
+                showConfirm("Adakah anda pasti untuk mengosongkan senarai pemenang?", () => {
+                    winners = [];
+                    document.getElementById('winnersCount').innerText = `0 pemenang`;
+                    document.getElementById('winnersUl').innerHTML = '<li class="text-center text-blue-400/50 italic py-4" id="emptyWinnerMsg">Belum ada pemenang lagi.</li>';
+                });
             }
         }
 
